@@ -6,6 +6,7 @@ import BlogChrome from '@/components/blog/BlogChrome';
 import Diagram from '@/components/portfolio/Diagram';
 import { WORK } from '@/components/portfolio/projects';
 import { postUrl, siteUrl } from '@/lib/blog/urls';
+import { EXPERIENCE } from '@/lib/data';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -34,6 +35,7 @@ export default async function CaseStudy({ params }: Props) {
   const i = WORK.findIndex((w) => w.id === slug);
   if (i < 0) notFound();
   const p = WORK[i];
+  const job = EXPERIENCE.find((e) => e.company === p.job);
   const prev = WORK[(i - 1 + WORK.length) % WORK.length];
   const next = WORK[(i + 1) % WORK.length];
 
@@ -54,8 +56,6 @@ export default async function CaseStudy({ params }: Props) {
               <div className="wide"><dt>Stack</dt><dd className="pf-chips">{p.stack.map((s) => <span key={s} className="chip">{s}</span>)}</dd></div>
             </dl>
 
-            <Diagram id={p.id} />
-
             {p.setting && (
               <section className="pf-case-block pf-setting">
                 <h2>The setting</h2>
@@ -64,10 +64,23 @@ export default async function CaseStudy({ params }: Props) {
               </section>
             )}
 
-            {p.bullets && (
+            <section className="pf-case-block">
+              <h2>How it works</h2>
+              <Diagram id={p.id} />
+            </section>
+
+            <section className="pf-case-block">
+              <h2>What I built</h2>
+              {job && <p className="pf-case-role">{job.role} · {job.company} · {job.period}</p>}
+              <ul className="pf-row-bullets">{(p.bullets ?? job?.points ?? []).map((b) => <li key={b}>{b}</li>)}</ul>
+            </section>
+
+            {p.results && p.results.length > 0 && (
               <section className="pf-case-block">
-                <h2>What I built</h2>
-                <ul className="pf-row-bullets">{p.bullets.map((b) => <li key={b}>{b}</li>)}</ul>
+                <h2>Results</h2>
+                <div className="pf-case-results">
+                  {p.results.map((r) => <div key={r.label}><b>{r.value}</b><span>{r.label}</span></div>)}
+                </div>
               </section>
             )}
 

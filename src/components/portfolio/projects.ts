@@ -14,6 +14,10 @@ export type Project = {
   kind: Kind;
   reading?: { title: string; slug: string }[];
   setting?: Setting;
+  job: string; // EXPERIENCE.company this was built at
+  // Real, publishable outcomes only. Renders a "Results" block when present, e.g.
+  // results: [{ value: '40%', label: 'faster page loads' }]
+  results?: { value: string; label: string }[];
 };
 
 // Public facts about the company and product, with a source to check them against.
@@ -52,6 +56,11 @@ const SETTING: Record<string, Setting> = {
   },
 };
 
+const JOB: Record<string, string> = {
+  'recruiter-ai': 'Crownstack Technologies', 'ticket-booking': 'Crownstack Technologies', checkministry: 'CheckMinistry',
+  avendus: 'DistrictD', districtd: 'DistrictD', rnd: 'DistrictD', proprofs: 'ProProfs',
+};
+
 const KIND: Record<string, Kind> = {
   'ticket-booking': 'AI', checkministry: 'SaaS', avendus: 'Fintech', districtd: 'Fintech', rnd: 'Fintech', proprofs: 'EdTech',
 };
@@ -66,4 +75,4 @@ export const WORK: Project[] = [
     ],
   },
   ...PROJECTS.map((p) => ({ id: p.id, year: p.year, name: p.name, tag: p.tag, summary: p.desc, stack: p.stack, links: p.links, kind: KIND[p.id] })),
-].map((p) => ({ ...p, links: p.links.filter((l) => l.href !== '#'), setting: SETTING[p.id] }));
+].map((p) => ({ ...p, links: p.links.filter((l) => l.href !== '#'), setting: SETTING[p.id], job: JOB[p.id] }));
