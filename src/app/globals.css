@@ -2174,8 +2174,11 @@ body[data-theme="terminal"] .pf-name::before { content: '~/'; color: var(--muted
 .pf-graph .base path { stroke: var(--line); }
 .pf-graph .lit path { stroke: var(--accent); }
 .pf-log { list-style: none; margin: 0; padding: 0; }
-.pf-commit { position: relative; padding: 14px 0 14px 76px; opacity: .42; transition: opacity 500ms; }
-.pf-commit.reached { opacity: 1; }
+.pf-commit { position: relative; padding: 14px 0 14px 76px; }
+/* Not-yet-reached commits are muted by colour, not opacity, so text keeps AA contrast. */
+.pf-commit:not(.reached) :is(.pf-commit-msg, .pf-hash) { color: var(--muted); }
+.pf-commit:not(.reached) .pf-tag { color: var(--muted); border-color: var(--line); }
+.pf-commit-msg, .pf-hash, .pf-tag { transition: color 500ms, border-color 500ms; }
 .pf-dot { position: absolute; top: 19px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: var(--bg); border: 2px solid var(--line); z-index: 1; transition: border-color 300ms, background 300ms, transform 450ms cubic-bezier(.3, 1.6, .5, 1); }
 .reached .pf-dot { border-color: var(--accent); background: var(--accent); transform: scale(1.12); }
 .is-job .pf-dot { top: 17px; width: 16px; height: 16px; margin-left: -8px; }
@@ -2206,8 +2209,11 @@ body[data-theme="terminal"] .pf-name::before { content: '~/'; color: var(--muted
 .pf-lane::before, .pf-lane::after { content: ''; position: absolute; top: 18px; left: 13px; height: 2px; background: var(--line); }
 .pf-lane::before { width: calc(80% + 11.2px); }
 .pf-lane::after { background: var(--accent); width: calc(max(0, var(--step, -1)) * (20% + 2.8px)); transition: width 800ms cubic-bezier(.2, .8, .2, 1); }
-.pf-stage { position: relative; padding-top: 44px; opacity: .4; transition: opacity 500ms; }
-.pf-stage.on { opacity: 1; }
+.pf-stage { position: relative; padding-top: 44px; }
+/* Unplayed steps dim their visual only; the text keeps full contrast. */
+.pf-stage-vis { transition: opacity 500ms; }
+.pf-stage:not(.on) .pf-stage-vis { opacity: .45; }
+.pf-stage:not(.on) h3 { color: var(--muted); }
 .pf-stage-no { position: absolute; top: 6px; left: 0; z-index: 1; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--bg); border: 2px solid var(--line); font-family: var(--font-mono); font-size: 10px; transition: background 300ms, border-color 300ms, color 300ms, box-shadow 300ms; }
 .pf-stage.on .pf-stage-no { background: var(--accent); border-color: var(--accent); color: #fff; }
 .pf-stage.is-now .pf-stage-no { box-shadow: 0 0 0 6px var(--accent-soft); }
@@ -2598,3 +2604,18 @@ html.pf-crt body { text-shadow: 0 0 6px color-mix(in srgb, var(--accent) 35%, tr
   .pf-diagram-note { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { .pf-steps li::after { animation: none; } }
+
+/* ── Accessible accent text ────────────────────────────────────────── */
+/* The bright accent is ~2.8:1 on cream; small text uses a darkened mix (≥4.5:1).
+   Large display accents (name dot, headlines) keep the bright colour. */
+:root { --accent-text: color-mix(in srgb, var(--accent) 70%, #000); }
+body[data-theme="terminal"] { --accent-text: var(--accent); }
+.link-pill, .pf-hash, .pf-case-read, .pf-setting-src a, .pf-now .accent, .pf-cmd .accent, .form-msg-err { color: var(--accent-text); }
+.pf-tag { color: var(--accent-text); border-color: var(--accent-text); }
+.pf-lane-label.side { fill: var(--accent-text); }
+.pf-setting-src a, .pf-case-read { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.link-pill:hover { border-color: var(--accent-text); }
+/* Hero entrance runs on CSS alone, so it doesn't wait for JavaScript. */
+.pf-enter { animation: pf-enter 800ms cubic-bezier(.2, .7, .2, 1) both; animation-delay: var(--rev-delay, 0ms); }
+@keyframes pf-enter { from { opacity: 0; transform: translateY(16px); filter: blur(4px); } }
+@media (prefers-reduced-motion: reduce) { .pf-enter { animation: none; } }

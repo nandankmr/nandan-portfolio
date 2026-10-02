@@ -101,7 +101,7 @@ export function AccentSwitcher({ value, onChange }: { value: Accent; onChange: (
   }, [open]);
 
   return (
-    <div ref={ref} className={'accent-switch' + (open ? ' open' : '')} role="tablist" aria-label="Accent color">
+    <div ref={ref} className={'accent-switch' + (open ? ' open' : '')} role="group" aria-label="Accent color">
       {ACCENT_OPTIONS.map((color) => {
         const isActive = value === color;
         return (
@@ -173,7 +173,7 @@ export default function Nav({ theme, onTheme, accent, onAccent, onPalette }: {
         <span className="nav-ind" aria-hidden="true" />
       </div>
       <div className="nav-right">
-        {onPalette && <button type="button" className="nav-k" onClick={onPalette} aria-label="Open command palette"><kbd>⌘</kbd><kbd>K</kbd></button>}
+        {onPalette && <button type="button" className="nav-k" onClick={onPalette} aria-label="⌘K, open command palette"><kbd>⌘</kbd><kbd>K</kbd></button>}
         <ThemeSwitcher value={theme} onChange={onTheme} />
         <AccentSwitcher value={accent} onChange={onAccent} />
         <a href={SITE.resume} download className="nav-cta">Résumé ↓</a>

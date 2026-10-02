@@ -74,7 +74,7 @@ export default function Hero({ onPalette }: { onPalette: () => void }) {
     <section id="home" className="pf-hero">
       <HeroField />
       <div className="container">
-        <div className="pf-status" data-reveal>
+        <div className="pf-status pf-enter">
           <span className="pf-live" aria-hidden="true" />
           Open to senior / staff IC roles · remote-first
         </div>
@@ -92,36 +92,36 @@ export default function Hero({ onPalette }: { onPalette: () => void }) {
 
         <p className="pf-lead">
           {LEAD.split(' ').map((w, i) => (
-            <span key={i} className="pf-wm"><span style={{ '--d': `${500 + i * 40}ms` } as React.CSSProperties}>{w}</span> </span>
+            <span key={i} className="pf-wm"><span style={{ '--d': `${300 + i * 40}ms` } as React.CSSProperties}>{w}</span> </span>
           ))}
-          <span className="pf-wm"><span className="accent" style={{ '--d': '760ms' } as React.CSSProperties}><Cycler phrases={DOES} /></span></span>
+          <span className="pf-wm"><span className="accent" style={{ '--d': '540ms' } as React.CSSProperties}><Cycler phrases={DOES} /></span></span>
         </p>
         <p className="pf-lead pf-lead-2">
           {LEAD2.split(' ').map((w, i) => (
-            <span key={i} className="pf-wm"><span style={{ '--d': `${860 + i * 28}ms` } as React.CSSProperties}>{w}</span> </span>
+            <span key={i} className="pf-wm"><span style={{ '--d': `${560 + i * 24}ms` } as React.CSSProperties}>{w}</span> </span>
           ))}
         </p>
 
-        <p className="pf-sub" data-reveal style={{ '--rev-delay': '700ms' } as React.CSSProperties}>
+        <p className="pf-sub pf-enter" style={{ '--rev-delay': '420ms' } as React.CSSProperties}>
           Senior full-stack &amp; AI engineer — six years across EdTech, FinTech and SaaS. Now building voice agents and
           multi-agent booking flows at <strong>Crownstack</strong>.
         </p>
 
-        <div className="pf-ctas" data-reveal style={{ '--rev-delay': '800ms' } as React.CSSProperties}>
+        <div className="pf-ctas pf-enter" style={{ '--rev-delay': '500ms' } as React.CSSProperties}>
           <a href="#work" className="btn btn-primary">See the work <span className="btn-arrow">↘</span></a>
           <a href={blogUrl()} className="btn">Read the blog <span className="btn-arrow">↗</span></a>
           <a href={SITE.resume} download className="btn">Résumé <span className="btn-arrow">↓</span></a>
-          <button type="button" className="btn pf-k" onClick={onPalette} aria-label="Open command palette"><kbd>⌘</kbd><kbd>K</kbd></button>
+          <button type="button" className="btn pf-k" onClick={onPalette} aria-label="⌘K, open command palette"><kbd>⌘</kbd><kbd>K</kbd></button>
         </div>
 
-        <dl className="pf-now" data-reveal style={{ '--rev-delay': '900ms' } as React.CSSProperties}>
+        <dl className="pf-now pf-enter" style={{ '--rev-delay': '580ms' } as React.CSSProperties}>
           <div><dt>Currently</dt><dd>AI engineer, <span className="accent">Crownstack</span></dd></div>
           <div><dt>Local time</dt><dd>{time || '··:··'} IST · Noida</dd></div>
           <div><dt>Reading</dt><dd>The LangChain source, so you don&apos;t have to</dd></div>
           <div><dt>Training</dt><dd>MCA, Jain University</dd></div>
         </dl>
 
-        <div className="pf-stats" data-reveal style={{ '--rev-delay': '1000ms' } as React.CSSProperties}>
+        <div className="pf-stats pf-enter" style={{ '--rev-delay': '660ms' } as React.CSSProperties}>
           <div><b><Count to={6} suffix="+" /></b><span>years shipping prod</span></div>
           <div><b><Count to={10} suffix="+" /></b><span>production products</span></div>
           <div><b><Count to={6} /></b><span>engineers led</span></div>
