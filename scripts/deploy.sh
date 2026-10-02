@@ -13,12 +13,22 @@ KEY="${OCI_KEY:-$HOME/Downloads/ins-me.key}"
 REMOTE="/home/ubuntu/portfolio"
 
 echo "→ Syncing source..."
+# --delete mirrors the tree, so anything server-only must be excluded below
+# (excluded paths are left untouched on the server, never deleted).
 rsync -avz --delete \
   --exclude='.next' \
   --exclude='node_modules' \
   --exclude='.env*' \
   --exclude='.git' \
   --exclude='*.log' \
+  --exclude='hermes/.venv' \
+  --exclude='hermes/__pycache__' \
+  --exclude='.serena' \
+  --exclude='.playwright-mcp' \
+  --exclude='.code-review-graph' \
+  --exclude='.claude' \
+  --exclude='.codex' \
+  --exclude='test-results' \
   -e "ssh -i $KEY" \
   ./ "$SERVER:$REMOTE/"
 
