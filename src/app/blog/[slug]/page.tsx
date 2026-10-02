@@ -7,7 +7,7 @@ import SafeMdx from '@/components/blog/SafeMdx';
 import ShareButton from '@/components/blog/ShareButton';
 import CommentsSection from '@/components/comments/CommentsSection';
 import { getAdjacentPosts, getPostBySlug } from '@/lib/blog/posts';
-import { blogUrl, postUrl } from '@/lib/blog/urls';
+import { blogUrl, postUrl, postVT } from '@/lib/blog/urls';
 import { getPublicComments } from '@/lib/comments/db';
 import { commentsGloballyEnabled } from '@/lib/comments/settings';
 
@@ -92,7 +92,7 @@ export default async function BlogPostPage({ params }: Props) {
               <span>{meta.readTime}</span>
             </div>
 
-            <h1 data-reveal style={{ '--rev-delay': '60ms' } as React.CSSProperties}>{meta.title}</h1>
+            <h1 style={postVT(meta.slug)}>{meta.title}</h1>
             <p className="article-dek" data-reveal style={{ '--rev-delay': '120ms' } as React.CSSProperties}>{meta.dek}</p>
 
             <div className="article-byline" data-reveal style={{ '--rev-delay': '180ms' } as React.CSSProperties}>

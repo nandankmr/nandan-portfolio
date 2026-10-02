@@ -4,7 +4,6 @@ import { notFound } from 'next/navigation';
 import { ViewTransition } from 'react';
 import BlogChrome from '@/components/blog/BlogChrome';
 import Diagram from '@/components/portfolio/Diagram';
-import Interactions from '@/components/portfolio/Interactions';
 import { WORK } from '@/components/portfolio/projects';
 import { postUrl, siteUrl } from '@/lib/blog/urls';
 
@@ -89,7 +88,6 @@ export default async function CaseStudy({ params }: Props) {
           </div>
         </article>
       </ViewTransition>
-      <Interactions />
     </BlogChrome>
   );
 }

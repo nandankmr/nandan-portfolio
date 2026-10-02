@@ -2,9 +2,10 @@
 import { useCallback, useEffect, useRef, useState, ViewTransition } from 'react';
 import Nav from '@/components/Nav';
 import Contact from '@/components/Contact';
+import Footer from '@/components/Footer';
 import { type Theme, type Accent, SITE } from '@/lib/data';
 import { HighlightProvider } from './highlight';
-import Hero, { useIstClock } from './Hero';
+import Hero from './Hero';
 import WorkIndex from './WorkIndex';
 import GitGraph from './GitGraph';
 import HowIWork from './HowIWork';
@@ -20,17 +21,6 @@ const DIR = { 'nav-forward': 'nav-forward', 'nav-back': 'nav-back', default: 'no
 function hexToRgba(hex: string, a: number) {
   const m = hex.replace('#', '');
   return `rgba(${parseInt(m.slice(0, 2), 16)}, ${parseInt(m.slice(2, 4), 16)}, ${parseInt(m.slice(4, 6), 16)}, ${a})`;
-}
-
-function PortfolioFooter() {
-  const t = useIstClock();
-  return (
-    <footer className="pf-footer">
-      <span>© {new Date().getFullYear()} Nandan Kumar</span>
-      <span>Noida · {t || '··:··'} IST</span>
-      <span>Built with Claude Code + Codex · reviewed by a human</span>
-    </footer>
-  );
 }
 
 // `stack` is rendered on the server (see app/page.tsx) so its logos stay out of the JS bundle.
@@ -149,7 +139,7 @@ export default function PortfolioPage({ posts, stack }: { posts: PostCard[]; sta
         <Contact />
       </main>
       </ViewTransition>
-      <PortfolioFooter />
+      <Footer />
       {palette && <CommandPalette onClose={() => setPalette(false)} onTheme={setTheme} />}
       <Interactions />
       {crt && <div className="pf-toast" role="status"><span className="accent">$</span> sudo mode unlocked — terminal theme on. <kbd>esc</kbd> to exit</div>}

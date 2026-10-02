@@ -23,6 +23,7 @@ export default function CommandPalette({ onClose, onTheme }: { onClose: () => vo
       { id: 'career', label: 'Show the career log', hint: 'section', keys: 'experience git history jobs', run: go('career') },
       { id: 'how', label: 'How do you work?', hint: 'section', keys: 'claude code codex workflow ai', run: go('how') },
       { id: 'stack', label: 'Show the stack', hint: 'section', keys: 'skills tools tech', run: go('stack') },
+      { id: 'uses', label: 'Open /uses — every tool, in detail', hint: 'page', keys: 'uses tools stack setup', run: () => { window.location.href = '/uses'; } },
       { id: 'writing', label: 'What have you written?', hint: 'section', keys: 'blog posts writing', run: go('writing') },
       { id: 'contact', label: 'Get in touch', hint: 'section', keys: 'contact email message', run: go('contact') },
       { id: 'hire', label: 'Hire Nandan', hint: 'action', keys: 'hire job offer recruit role', run: () => {

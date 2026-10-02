@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Footer from '@/components/Footer';
 import { AccentSwitcher, ThemeSwitcher } from '@/components/Nav';
 import DiagramLightbox from '@/components/blog/DiagramLightbox';
+import Interactions from '@/components/portfolio/Interactions';
 import { type Accent, type Theme } from '@/lib/data';
 import { siteUrl } from '@/lib/blog/urls';
 
@@ -84,6 +85,7 @@ export default function BlogChrome({
       {children}
       <Footer />
       <DiagramLightbox />
+      <Interactions />
     </>
   );
 }

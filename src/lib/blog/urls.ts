@@ -25,3 +25,9 @@ export function internalBlogPath(path = '') {
   const normalized = path.startsWith('/') ? path : `/${path}`;
   return `/blog${normalized === '/' ? '' : normalized}`;
 }
+
+// Same view-transition name on a post's title in the index and on its page,
+// so a cross-document navigation morphs one into the other.
+export function postVT(slug: string) {
+  return { viewTransitionName: `post-${slug.replace(/[^a-zA-Z0-9-]/g, '')}`, viewTransitionClass: 'pf-morph' } as React.CSSProperties;
+}

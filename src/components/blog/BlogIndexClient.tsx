@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { blogUrl, postUrl, siteUrl } from '@/lib/blog/urls';
+import { blogUrl, postUrl, postVT, siteUrl } from '@/lib/blog/urls';
 import type { BlogPostMeta } from '@/lib/blog/types';
 
 function formatDate(date: string) {
@@ -46,7 +46,7 @@ export default function BlogIndexClient({
               <span className="featured-num">01</span>
               <div>
                 <div className="featured-meta">★ Featured · {featured.category}</div>
-                <h2>{featured.title}</h2>
+                <h2 style={postVT(featured.slug)}>{featured.title}</h2>
                 <p>{featured.dek}</p>
               </div>
               <div className="featured-tail">
@@ -85,7 +85,7 @@ export default function BlogIndexClient({
                 >
                   <div>
                     <div className="blog-row-cat">{post.draft ? 'Draft · ' : ''}{post.category}</div>
-                    <h3 className="blog-row-title">{post.title}</h3>
+                    <h3 className="blog-row-title" style={post.draft ? undefined : postVT(post.slug)}>{post.title}</h3>
                     <p className="blog-row-excerpt">{post.dek}</p>
                   </div>
                   <div className="blog-row-meta">
