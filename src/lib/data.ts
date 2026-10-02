@@ -1,3 +1,5 @@
+import { postUrl } from '@/lib/blog/urls';
+
 export const SITE = {
   name: 'NANDAN KUMAR',
   role: 'Senior Full-stack & AI Engineer',
@@ -17,6 +19,7 @@ export const EXPERIENCE = [
     period: 'Dec 2025 — Present',
     location: 'Noida, Sector-3',
     kind: 'AI · Agentic systems',
+    about: 'Product-engineering firm (est. 2017) with a generative-AI practice: LLM features and workflow agents for clients.',
     points: [
       'Designing and shipping production-grade agentic-AI products end-to-end — voice agents, conversational booking flows, and the supporting infrastructure that holds them together.',
       'Built Recruiter AI: a voice agent that places live phone screens over Twilio + Exotel, transcribes in real time with Deepgram, and produces structured, recruiter-ready evaluations via LangChain.',
@@ -31,6 +34,7 @@ export const EXPERIENCE = [
     period: 'Feb 2025 — Dec 2025',
     location: 'Okhla Phase III, Delhi',
     kind: 'SaaS · Background verification',
+    about: 'ISO 27001-certified screening SaaS: 20+ check types for 300+ clients, most returned in about 72 hours.',
     points: [
       'Shipped the core of CheckMinistry\'s enterprise BGV platform — automated workflows, document validation, and real-time status tracking.',
       'Led the team to deliver scalable, secure features against tight compliance deadlines.',
@@ -44,6 +48,7 @@ export const EXPERIENCE = [
     period: 'Nov 2021 — Jan 2025',
     location: 'Noida, Sector-2',
     kind: 'Fintech · Wealth management',
+    about: 'Bootstrapped fintech (est. 2016) building research, portfolio analysis and client reporting for wealth managers.',
     points: [
       'Led a ground-up rewrite of the platform on a modern stack — cut page-load times and unblocked the analytics roadmap.',
       'Owned Avendus Wealth end-to-end — an analytics + PPT/PDF reporting platform — plus one other major release.',
@@ -58,6 +63,7 @@ export const EXPERIENCE = [
     period: 'Mar 2020 — Nov 2021',
     location: 'Noida, NSEZ',
     kind: 'EdTech · SaaS',
+    about: 'Training and support SaaS (Training Maker, Quiz Maker, Knowledge Base) used in 150+ countries.',
     points: [
       'Built and maintained responsive web applications for an educational-technology platform.',
       'Shipped customer-facing features across the core product.',
@@ -162,6 +168,7 @@ export const SKILLS = [
       { name: 'ChromaDB',    years: 1, projects: ['Internal RAG'] },
       { name: 'Deepgram',    years: 1, projects: ['Recruiter AI'] },
       { name: 'Sarvam.ai',   years: 1, projects: ['Recruiter AI'] },
+      { name: 'Twilio',      years: 1, projects: ['Recruiter AI'] },
       { name: 'Claude Code', years: 1, projects: ['Internal tooling'] },
     ],
   },
@@ -219,9 +226,42 @@ export const FEATURED = {
   stack: ['React', 'Python', 'LangChain', 'Twilio', 'Deepgram', 'Sarvam.ai', 'PostgreSQL'],
   links: [
     { label: 'GitHub', href: 'https://github.com/nandankmr/RecruiteAI' },
-    { label: 'Write-up', href: '#' },
+    { label: 'Write-up', href: postUrl('building-recruiteai-voice-agent') },
   ],
 };
+
+// Career as `git log --reverse --graph`. `main` is the day job; `side` is a
+// branch of personal projects (dates are when the repo was last pushed on
+// github.com/nandankmr). `side: 'open' | 'merge'` forks/joins the side lane.
+export type Commit = {
+  date: string;
+  lane: 'main' | 'side';
+  msg: string;
+  body?: string;
+  tag?: string;
+  job?: string; // EXPERIENCE.company — expands to that role's details
+  side?: 'open' | 'merge';
+  head?: boolean;
+};
+
+export const CAREER: Commit[] = [
+  { date: 'Dec 2017', lane: 'main', msg: 'init: learning-python', body: 'First public repo. Python basics, one exercise at a time.' },
+  { date: 'Mar 2018', lane: 'side', side: 'open', msg: 'feat(c++): N-Language', body: 'C and C++ practice — N-Language, then linked lists in C, by hand.' },
+  { date: 'Jun 2018', lane: 'main', msg: 'feat(web): first Django app', body: 'mySite, then a movie database. The web clicked.' },
+  { date: 'Mar 2020', lane: 'main', tag: 'v1.0', job: 'ProProfs', msg: 'job(proprofs): web developer' },
+  { date: 'Jan 2021', lane: 'side', msg: 'feat: ImageFinder', body: 'One search across Pixabay, Unsplash, Pexels and Giphy, with accounts.' },
+  { date: 'Sep 2021', lane: 'side', side: 'merge', msg: 'feat: whisper client + server', body: 'A JavaScript client and server, built as a pair.' },
+  { date: 'Nov 2021', lane: 'main', tag: 'v2.0', job: 'DistrictD', msg: 'job(districtd): senior software engineer' },
+  { date: '2022', lane: 'main', msg: 'perf: worker threads + React Native R&D', body: 'Findings became the team performance guidelines.' },
+  { date: 'May 2023', lane: 'side', side: 'open', msg: 'feat: chirp (T3 stack)', body: 'Next.js + NextAuth on create-t3-app, to learn the stack properly.' },
+  { date: '2023', lane: 'main', msg: 'refactor!: platform rewrite', body: 'Ground-up rewrite on a modern stack; page loads came down.' },
+  { date: 'Dec 2024', lane: 'side', side: 'merge', msg: 'feat: e-commerce api + web', body: 'Orders end to end — backend and frontend as separate repos.' },
+  { date: 'Feb 2025', lane: 'main', tag: 'v3.0', job: 'CheckMinistry', msg: 'job(checkministry): senior software engineer' },
+  { date: 'Nov 2025', lane: 'side', side: 'open', msg: 'feat: pulse', body: 'Realtime chat in React Native + Socket.io — groups, attachments, unread badges.' },
+  { date: 'Dec 2025', lane: 'main', tag: 'v4.0', job: 'Crownstack Technologies', msg: 'job(crownstack): ai engineer' },
+  { date: 'May 2026', lane: 'side', side: 'merge', msg: 'feat: quick-survey + this site', body: 'Open-source multi-tenant Rails 8 surveys; this portfolio, its blog and Hermes, the agent that drafts posts.' },
+  { date: 'now', lane: 'main', head: true, msg: 'HEAD → open to senior / staff IC roles', body: 'Remote-first preferred. GMT+5:30.' },
+];
 
 export const ACCENT_OPTIONS = ['#ff5b2e', '#2563eb', '#a855f7'] as const;
 export const THEME_IDS = ['minimal', 'terminal', 'bold'] as const;

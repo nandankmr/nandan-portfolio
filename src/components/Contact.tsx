@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 
 const Turnstile = dynamic(() => import('@marsidev/react-turnstile').then((mod) => mod.Turnstile), { ssr: false });
@@ -34,6 +34,13 @@ export default function Contact() {
   const [status, setStatus] = useState<Status>('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const [values, setValues] = useState({ name: '', email: '', company: '', message: '' });
+
+  // The ⌘K "hire" easter egg pre-fills the message (never overwrites typed text).
+  useEffect(() => {
+    const onPrefill = (e: Event) => setValues((v) => (v.message ? v : { ...v, message: (e as CustomEvent<string>).detail }));
+    window.addEventListener('pf:prefill', onPrefill);
+    return () => window.removeEventListener('pf:prefill', onPrefill);
+  }, []);
 
   const captchaToken = useRef<string>('');
   const turnstileRef = useRef<any>(null);

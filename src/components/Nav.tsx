@@ -1,17 +1,34 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { SITE, ACCENT_OPTIONS, type Theme, type Accent } from '@/lib/data';
 import { blogUrl } from '@/lib/blog/urls';
 
 const NAV_SECTIONS = [
   ['home', 'Index'],
-  ['now', 'Now'],
-  ['experience', 'Experience'],
   ['work', 'Work'],
-  ['writing', 'Blog', blogUrl()],
-  ['skills', 'Stack'],
+  ['career', 'Career'],
+  ['how', 'How I work'],
+  ['stack', 'Stack'],
+  ['blog', 'Blog', blogUrl()],
   ['contact', 'Contact'],
 ] as const;
+
+// Theme swaps reveal as a circle spreading from the clicked button, where the
+// View Transitions API exists; elsewhere they simply switch.
+function switchTheme(e: React.MouseEvent, id: Theme, onChange: (v: Theme) => void) {
+  const apply = () => { document.body.dataset.theme = id; onChange(id); };
+  const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown };
+  if (!doc.startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return apply();
+  const r = Math.hypot(Math.max(e.clientX, innerWidth - e.clientX), Math.max(e.clientY, innerHeight - e.clientY));
+  document.documentElement.style.setProperty('--vt-x', `${e.clientX}px`);
+  document.documentElement.style.setProperty('--vt-y', `${e.clientY}px`);
+  document.documentElement.style.setProperty('--vt-r', `${r}px`);
+  // The class scopes the circle CSS to theme switches, not route transitions.
+  document.documentElement.classList.add('vt-theme');
+  const vt = doc.startViewTransition(() => flushSync(apply)) as { finished?: Promise<void> } | undefined;
+  vt?.finished?.finally(() => document.documentElement.classList.remove('vt-theme'));
+}
 
 const THEMES = [
   {
@@ -55,7 +72,7 @@ export function ThemeSwitcher({ value, onChange }: { value: Theme; onChange: (v:
           aria-selected={value === th.id}
           aria-label={th.label}
           title={th.label}
-          onClick={() => onChange(th.id)}
+          onClick={(e) => switchTheme(e, th.id, onChange)}
           className={'theme-swatch' + (value === th.id ? ' active' : '')}
         >
           {th.icon}
@@ -109,23 +126,25 @@ export function AccentSwitcher({ value, onChange }: { value: Accent; onChange: (
   );
 }
 
-export default function Nav({ theme, onTheme, accent, onAccent }: {
+export default function Nav({ theme, onTheme, accent, onAccent, onPalette }: {
   theme: Theme;
   onTheme: (v: Theme) => void;
   accent: Accent;
   onAccent: (v: Accent) => void;
+  onPalette?: () => void;
 }) {
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState('home');
+  const linksRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 40);
+      // Page order; the on-page "writing" section lights the Blog link.
       let current = 'home';
-      for (const [id] of NAV_SECTIONS) {
-        if (id === 'writing') continue;
+      for (const id of ['home', 'work', 'career', 'how', 'stack', 'writing', 'contact']) {
         const el = document.getElementById(id);
-        if (el && el.getBoundingClientRect().top <= 120) current = id;
+        if (el && el.getBoundingClientRect().top <= 120) current = id === 'writing' ? 'blog' : id;
       }
       setActive(current);
     };
@@ -134,18 +153,27 @@ export default function Nav({ theme, onTheme, accent, onAccent }: {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // One indicator dot that glides to the active link.
+  useEffect(() => {
+    const box = linksRef.current;
+    const a = box?.querySelector<HTMLElement>('a.active');
+    if (box && a) box.style.setProperty('--ind-x', `${a.offsetLeft + a.offsetWidth / 2 - 2}px`);
+  }, [active]);
+
   return (
     <nav className={'nav' + (scrolled ? ' scrolled' : '')}>
       <a href="#home" className="nav-logo">
         <span className="dot" aria-hidden="true" />
         nandankumar.com
       </a>
-      <div className="nav-links">
+      <div className="nav-links has-ind" ref={linksRef}>
         {NAV_SECTIONS.map(([id, label, href]) => (
           <a key={id} href={href ?? `#${id}`} className={active === id ? 'active' : ''}>{label}</a>
         ))}
+        <span className="nav-ind" aria-hidden="true" />
       </div>
       <div className="nav-right">
+        {onPalette && <button type="button" className="nav-k" onClick={onPalette} aria-label="Open command palette"><kbd>⌘</kbd><kbd>K</kbd></button>}
         <ThemeSwitcher value={theme} onChange={onTheme} />
         <AccentSwitcher value={accent} onChange={onAccent} />
         <a href={SITE.resume} download className="nav-cta">Résumé ↓</a>
