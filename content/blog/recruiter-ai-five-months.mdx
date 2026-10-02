@@ -1,0 +1,73 @@
+export const meta = {
+  slug: 'recruiter-ai-five-months',
+  title: 'Shipping Recruiter AI in five months.',
+  description: 'A voice agent that places real phone calls. What went right, what went wrong, and what made recruiters trust the output.',
+  dek: 'A voice agent that places real phone calls. What I got right, what I got wrong, and the surprising part nobody warned me about.',
+  category: 'AI Engineering',
+  publishedAt: '2026-04-12',
+  readTime: '12 min',
+  featured: true,
+  draft: false,
+  tags: ['voice agents', 'LangChain', 'production AI', 'recruiting'],
+  toc: [
+    { id: 'the-brief', label: 'The brief' },
+    { id: 'first-demo', label: 'First demo' },
+    { id: 'earning-trust', label: 'Earning trust' },
+    { id: 'what-we-got-wrong', label: 'What we got wrong' },
+    { id: 'what-id-do-again', label: "What I'd do again" },
+  ],
+};
+
+The brief was simple, the way the best briefs always are. Build us something that can do first-round phone screens for engineering candidates. The hard part was never the voice. The hard part was earning the recruiters' trust to forward the agent's assessment without re-listening to the whole call.
+
+We started in November. We were placing real calls by April. Five months end-to-end, with two engineers and a small army of cooperative recruiters who agreed to be on the receiving end of a hundred robotic calls in service of making us less robotic. This is the long version of what I would say in an interview if you asked.
+
+<h2 id="the-brief">The brief</h2>
+
+Crownstack's recruiting team was burning roughly fifteen hours a week on first-round phone screens. The screens themselves were valuable. They caught fakes, surfaced communication issues, let candidates ask their own questions, and gave hiring managers enough signal to decide who deserved the next interview.
+
+If you have never worked closely with a recruiter, the part most engineers do not appreciate is the triage. A recruiter does not make a hire/no-hire decision after a phone screen. They make a who-deserves-the-next-thirty-minutes decision.
+
+We wanted an agent that could do that. Not the "AI replaces recruiters" pitch; more "AI does the boring forty-five minutes so the recruiter can spend fifteen minutes on the part that needs them."
+
+<h2 id="first-demo">First demo</h2>
+
+By month three we had a working prototype. Twilio for the phone connection, Deepgram for transcription, and a LangChain agent that produced surprisingly natural conversation. The first time it called me I almost forgot it was an agent.
+
+I ran the demo for our head of talent. She listened to twelve seconds and said: "Okay. So what does it write at the end?"
+
+> Most of the engineering happens after the demo works.
+
+The voice was solvable in a month. Earning trust in the write-up took the rest of the project.
+
+<h2 id="earning-trust">Earning trust</h2>
+
+Two ideas came out of that first meeting that I think are good enough to share.
+
+The first was that the agent's output had to be structured, not prose. Recruiters at Crownstack have a one-page template they fill out after every call. Free-text evaluations from an LLM are vibes. Filled-in templates with cited quotes are evidence.
+
+The second was harder: the agent should not summarize what the candidate said, it should cite it. We rebuilt the eval step to produce JSON that included a list of rating, quote, and transcript offset triples. Recruiters could read the output like a normal report, but every rating was a link they could click to play back the exact audio it was based on.
+
+<div className="prose-callout">
+  <p>If you want a human to trust an LLM's output, give them a fast way to verify it that they almost never need to use. The fact that verification is one click away is the whole product.</p>
+</div>
+
+<h2 id="what-we-got-wrong">What we got wrong</h2>
+
+Latency. We optimized for 800ms turn latency before we had even shipped the eval pipeline. In retrospect that was vanity: the sound of intelligence. Once we started showing the agent to real candidates, the feedback was not "you are too slow." It was "this question does not make sense in the order you asked it."
+
+We also under-invested in the recruiter's UI. The audio playback was great. The list of past screens was not. There is a UI you do not notice when you use it once a week, and a UI that frustrates you when you use it fifty times a day. I learned the difference in production.
+
+```ts
+type EvaluationEvidence = {
+  rating: 'strong' | 'mixed' | 'weak';
+  quote: string;
+  transcriptOffsetMs: number;
+};
+```
+
+<h2 id="what-id-do-again">What I'd do again</h2>
+
+Pretty much everything else. The structured-output discipline, the cite-don't-summarize rule, and the willingness to keep adjusting prompts based on real call recordings took us from impressive demo to actually replacing repetitive work.
+
+If you want to talk about voice agents, drop me a line. I am running another of these projects right now and always trade notes.

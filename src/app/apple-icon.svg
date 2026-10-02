@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <rect width="180" height="180" rx="40" fill="#14140e"/>
+  <text x="90" y="128" text-anchor="middle" font-family="Inter, -apple-system, system-ui, sans-serif" font-weight="700" font-size="112" letter-spacing="-5" fill="#fbf8ef">N</text>
+  <circle cx="138" cy="132" r="11" fill="#ff5b2e"/>
+</svg>

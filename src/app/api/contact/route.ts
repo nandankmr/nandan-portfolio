@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { getClientIp } from '@/lib/comments/ip';
+import { isRateLimited, recordHit } from '@/lib/rate-limit';
+
+const esc = (s: string) =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 // Lazily constructed so the build doesn't fail without a key
 let _resend: Resend | null = null;
@@ -9,13 +14,15 @@ function getResend() {
 }
 
 const TO_EMAIL = 'nandankmrjha@gmail.com';
-const FROM_EMAIL = process.env.FROM_EMAIL ?? 'portfolio@nandan.dev';
+const FROM_EMAIL = process.env.FROM_EMAIL ?? 'contact@nandankumar.com';
 
 interface ContactPayload {
   name: string;
   email: string;
   company?: string;
   message: string;
+  website?: string; // honeypot
+  captchaToken?: string;
 }
 
 function validate(body: Partial<ContactPayload>): string | null {
@@ -24,6 +31,27 @@ function validate(body: Partial<ContactPayload>): string | null {
     return 'Valid email is required.';
   if ((body.message?.trim().length ?? 0) < 10) return 'Message is too short.';
   return null;
+}
+
+/* ── Cloudflare Turnstile verification ────────────────────────────── */
+
+async function verifyCaptcha(token: string, ip: string): Promise<boolean> {
+  const secret = process.env.TURNSTILE_SECRET_KEY;
+  if (!secret) return true; // Skip in dev when no secret is configured
+
+  try {
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ secret, response: token, remoteip: ip }),
+    });
+    const data = await res.json() as { success: boolean };
+    return data.success === true;
+  } catch (e) {
+    console.error('[contact] Turnstile verification error:', e);
+    // Fail open so a Cloudflare outage doesn't lock the form
+    return true;
+  }
 }
 
 function buildHtml(b: ContactPayload) {
@@ -56,19 +84,19 @@ function buildHtml(b: ContactPayload) {
     <div class="body">
       <div class="row">
         <div class="label">From</div>
-        <div class="value">${b.name} &mdash; <a href="mailto:${b.email}">${b.email}</a></div>
+        <div class="value">${esc(b.name)} &mdash; <a href="mailto:${esc(b.email)}">${esc(b.email)}</a></div>
       </div>
       ${b.company ? `
       <div class="row">
         <div class="label">Company / Role</div>
-        <div class="value">${b.company}</div>
+        <div class="value">${esc(b.company)}</div>
       </div>` : ''}
       <div class="row">
         <div class="label">Message</div>
-        <div class="message">${b.message.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+        <div class="message">${esc(b.message)}</div>
       </div>
     </div>
-    <div class="footer">nandan.dev portfolio · reply directly to this email to respond</div>
+    <div class="footer">nandankumar.com portfolio · reply directly to this email to respond</div>
   </div>
 </body>
 </html>`.trim();
@@ -83,8 +111,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON.' }, { status: 400 });
   }
 
+  // Honeypot — bots fill the hidden `website` field. Pretend success, drop.
+  if (body.website && String(body.website).trim()) {
+    return NextResponse.json({ ok: true });
+  }
+
+  // CAPTCHA verification (before rate-limit so bots don't pollute the bucket)
+  const ip = getClientIp(req);
+  const token = body.captchaToken;
+  if (process.env.TURNSTILE_SECRET_KEY && (!token || !(await verifyCaptcha(token, ip)))) {
+    return NextResponse.json({ error: 'CAPTCHA verification failed. Please try again.' }, { status: 403 });
+  }
+
+  // Rate limit: 5 messages / 10 min per IP.
+  if (await isRateLimited('contact', ip, 5, 10 * 60_000)) {
+    return NextResponse.json({ error: 'Too many messages. Try again later.' }, { status: 429 });
+  }
+
   const err = validate(body);
   if (err) return NextResponse.json({ error: err }, { status: 422 });
+
+  await recordHit('contact', ip);
 
   const payload = body as ContactPayload;
 

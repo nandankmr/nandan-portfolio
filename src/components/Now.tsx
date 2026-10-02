@@ -10,9 +10,8 @@ function formatIST() {
 }
 
 function LiveClock() {
-  const [t, setT] = useState('');
+  const [t, setT] = useState(() => formatIST());
   useEffect(() => {
-    setT(formatIST());
     const id = setInterval(() => setT(formatIST()), 30000);
     return () => clearInterval(id);
   }, []);
@@ -87,8 +86,8 @@ export default function Now() {
               <span className="now-item-value">AI engineer at <span className="accent">Crownstack</span> — building agentic systems</span>
             </div>
             <div className="now-item">
-              <span className="now-item-label">Based</span>
-              <span className="now-item-value">{SITE.location} · <LiveClock /></span>
+              <span className="now-item-label">Timezone</span>
+              <span className="now-item-value"><LiveClock /></span>
             </div>
             <div className="now-item">
               <span className="now-item-label">Reading</span>

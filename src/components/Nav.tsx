@@ -1,12 +1,14 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { SITE, ACCENT_OPTIONS, THEME_IDS, type Theme, type Accent } from '@/lib/data';
+import { SITE, ACCENT_OPTIONS, type Theme, type Accent } from '@/lib/data';
+import { blogUrl } from '@/lib/blog/urls';
 
 const NAV_SECTIONS = [
   ['home', 'Index'],
   ['now', 'Now'],
   ['experience', 'Experience'],
   ['work', 'Work'],
+  ['writing', 'Blog', blogUrl()],
   ['skills', 'Stack'],
   ['contact', 'Contact'],
 ] as const;
@@ -43,7 +45,7 @@ const THEMES = [
   },
 ];
 
-function ThemeSwitcher({ value, onChange }: { value: Theme; onChange: (v: Theme) => void }) {
+export function ThemeSwitcher({ value, onChange }: { value: Theme; onChange: (v: Theme) => void }) {
   return (
     <div className="theme-switch" role="tablist" aria-label="Theme">
       {THEMES.map((th) => (
@@ -63,7 +65,7 @@ function ThemeSwitcher({ value, onChange }: { value: Theme; onChange: (v: Theme)
   );
 }
 
-function AccentSwitcher({ value, onChange }: { value: Accent; onChange: (v: Accent) => void }) {
+export function AccentSwitcher({ value, onChange }: { value: Accent; onChange: (v: Accent) => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -89,7 +91,7 @@ function AccentSwitcher({ value, onChange }: { value: Accent; onChange: (v: Acce
           <button
             key={color}
             type="button"
-            aria-selected={isActive}
+            aria-pressed={isActive}
             aria-label={`Accent ${color}`}
             title={open ? color : 'Change accent'}
             onClick={() => {
@@ -121,6 +123,7 @@ export default function Nav({ theme, onTheme, accent, onAccent }: {
       setScrolled(window.scrollY > 40);
       let current = 'home';
       for (const [id] of NAV_SECTIONS) {
+        if (id === 'writing') continue;
         const el = document.getElementById(id);
         if (el && el.getBoundingClientRect().top <= 120) current = id;
       }
@@ -135,11 +138,11 @@ export default function Nav({ theme, onTheme, accent, onAccent }: {
     <nav className={'nav' + (scrolled ? ' scrolled' : '')}>
       <a href="#home" className="nav-logo">
         <span className="dot" aria-hidden="true" />
-        nandan.dev
+        nandankumar.com
       </a>
       <div className="nav-links">
-        {NAV_SECTIONS.map(([id, label]) => (
-          <a key={id} href={`#${id}`} className={active === id ? 'active' : ''}>{label}</a>
+        {NAV_SECTIONS.map(([id, label, href]) => (
+          <a key={id} href={href ?? `#${id}`} className={active === id ? 'active' : ''}>{label}</a>
         ))}
       </div>
       <div className="nav-right">

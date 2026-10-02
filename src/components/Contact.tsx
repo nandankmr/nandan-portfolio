@@ -1,8 +1,16 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import dynamic from 'next/dynamic';
+
+const Turnstile = dynamic(() => import('@marsidev/react-turnstile').then((mod) => mod.Turnstile), { ssr: false });
 import { SITE } from '@/lib/data';
+import { BLOG_LABEL, blogUrl } from '@/lib/blog/urls';
 
 type Status = 'idle' | 'sending' | 'sent' | 'error';
+
+
+
+const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? '';
 
 function Field({ label, required, optional, children }: {
   label: string;
@@ -27,6 +35,9 @@ export default function Contact() {
   const [errorMsg, setErrorMsg] = useState('');
   const [values, setValues] = useState({ name: '', email: '', company: '', message: '' });
 
+  const captchaToken = useRef<string>('');
+  const turnstileRef = useRef<any>(null);
+
   const onChange = (k: keyof typeof values) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setValues((v) => ({ ...v, [k]: e.target.value }));
 
@@ -34,6 +45,7 @@ export default function Contact() {
     if (!values.name.trim()) return 'Please enter your name.';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())) return 'Please enter a valid email.';
     if (values.message.trim().length < 10) return 'A few more words about what you have in mind?';
+    if (SITE_KEY && !captchaToken.current) return 'Please complete the verification.';
     return '';
   };
 
@@ -53,14 +65,20 @@ export default function Contact() {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
+        body: JSON.stringify({ ...values, captchaToken: captchaToken.current }),
       });
-      if (!res.ok) throw new Error('Server responded ' + res.status);
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Server responded ' + res.status);
+      }
       setStatus('sent');
       setValues({ name: '', email: '', company: '', message: '' });
-    } catch {
+      // Reset widget for next submission
+      captchaToken.current = '';
+      turnstileRef.current?.reset();
+    } catch (err) {
       setStatus('error');
-      setErrorMsg('Something went wrong. Try the email link on the right?');
+      setErrorMsg(err instanceof Error ? err.message : 'Something went wrong. Try the email link on the right?');
     }
   };
 
@@ -99,6 +117,22 @@ export default function Contact() {
             </Field>
             <input type="text" name="website" tabIndex={-1} autoComplete="off" className="honeypot" aria-hidden="true" />
 
+            {SITE_KEY && (
+              <div className="captcha-row">
+                <span className="captcha-label">Verification</span>
+                <div className="captcha-widget">
+                  <Turnstile
+                    ref={turnstileRef}
+                    siteKey={SITE_KEY}
+                    options={{ theme: 'auto', appearance: 'always' }}
+                    onSuccess={(token) => { captchaToken.current = token; }}
+                    onError={() => { captchaToken.current = 'error_fallback'; }}
+                    onExpire={() => { captchaToken.current = ''; }}
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="form-foot">
               <button type="submit" className="form-submit" disabled={status === 'sending'}>
                 {status === 'sending' && 'Sending…'}
@@ -108,7 +142,6 @@ export default function Contact() {
               <div className="form-msg">
                 {status === 'sent' && <span className="form-msg-ok">Thanks — I&apos;ll reply within 48 hours.</span>}
                 {status === 'error' && <span className="form-msg-err">{errorMsg}</span>}
-                {status === 'idle' && <span className="form-msg-hint">Or use one of the channels on the right.</span>}
               </div>
             </div>
           </form>
@@ -120,6 +153,7 @@ export default function Contact() {
                 { l: 'Email', v: SITE.email, href: `mailto:${SITE.email}` },
                 { l: 'Phone', v: SITE.phone, href: `tel:${SITE.phone.replace(/\s/g, '')}` },
                 { l: 'LinkedIn', v: SITE.linkedin, href: `https://${SITE.linkedin}` },
+                { l: 'Blog', v: BLOG_LABEL, href: blogUrl() },
                 { l: 'Résumé', v: 'Download PDF', href: SITE.resume, download: true },
               ].map((x) => (
                 <a
@@ -138,10 +172,6 @@ export default function Contact() {
                 </a>
               ))}
             </div>
-            <p className="contact-fineprint">
-              Best for direct outreach from hiring managers, founders, and engineering leads.
-              Recruiters welcome with a real role and a real salary band.
-            </p>
           </aside>
         </div>
       </div>

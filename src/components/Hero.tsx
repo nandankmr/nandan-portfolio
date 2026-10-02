@@ -1,4 +1,5 @@
 import { SITE } from '@/lib/data';
+import { blogUrl } from '@/lib/blog/urls';
 
 export default function Hero() {
   return (
@@ -6,16 +7,12 @@ export default function Hero() {
       <div className="container">
         <div className="grid">
           <div>
-            <div className="hero-status" data-reveal>
-              <span className="dot" aria-hidden="true" />
-              <span>Available · Open to senior / staff roles</span>
-            </div>
             <h1 data-reveal style={{ '--rev-delay': '80ms' } as React.CSSProperties}>
               Nandan<br />
               Kumar<span className="accent">.</span>
             </h1>
             <div className="hero-role" data-reveal style={{ '--rev-delay': '160ms' } as React.CSSProperties}>
-              Full-stack AI Engineer · 6+ years · {SITE.location}
+              Full-stack AI Engineer · 6+ years
             </div>
             <p className="hero-bio" data-reveal style={{ '--rev-delay': '240ms' } as React.CSSProperties}>
               I build production systems across <strong>EdTech, FinTech, SaaS</strong> and AI — most
@@ -24,6 +21,7 @@ export default function Hero() {
             </p>
             <div className="hero-ctas" data-reveal style={{ '--rev-delay': '320ms' } as React.CSSProperties}>
               <a href="#work" className="btn btn-primary">View selected work <span className="btn-arrow">↗</span></a>
+              <a href={blogUrl()} className="btn">Read blog <span className="btn-arrow">↗</span></a>
               <a href={SITE.resume} download className="btn">Download résumé <span className="btn-arrow">↓</span></a>
               <a href={`mailto:${SITE.email}`} className="btn">Email <span className="btn-arrow">→</span></a>
             </div>
@@ -41,9 +39,9 @@ export default function Hero() {
               <div className="hero-card-meta">Built &amp; mentored at DistrictD</div>
             </div>
             <div className="hero-card">
-              <div className="hero-card-label">FOR HIRE</div>
-              <div className="hero-card-title">Senior / Staff IC roles</div>
-              <div className="hero-card-meta">Full-stack · agentic AI · platform · devex</div>
+              <div className="hero-card-label">BLOG</div>
+              <a href={blogUrl()} className="hero-card-title">Essays on AI engineering</a>
+              <div className="hero-card-meta">Voice agents · systems · leadership</div>
             </div>
           </aside>
         </div>

@@ -9,7 +9,7 @@ import Work from '@/components/Work';
 import Skills from '@/components/Skills';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
-import { ACCENT_OPTIONS, THEME_IDS, type Theme, type Accent } from '@/lib/data';
+import { type Theme, type Accent } from '@/lib/data';
 
 function hexToRgba(hex: string, a: number) {
   const m = hex.replace('#', '');
@@ -19,20 +19,12 @@ function hexToRgba(hex: string, a: number) {
   return `rgba(${r}, ${g}, ${b}, ${a})`;
 }
 
-function randomPick<T>(arr: readonly T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
 export default function Page() {
+  // Fixed defaults: light ('minimal') theme + #ff5b2e accent. The Nav
+  // switchers still let visitors change these for the session.
   const [theme, setTheme] = useState<Theme>('minimal');
-  const [accent, setAccent] = useState<Accent>('#a855f7');
+  const [accent, setAccent] = useState<Accent>('#ff5b2e');
   const progressRef = useRef<HTMLDivElement>(null);
-
-  // Randomise on first mount (client-only to avoid hydration mismatch)
-  useEffect(() => {
-    setTheme(randomPick(THEME_IDS));
-    setAccent(randomPick(ACCENT_OPTIONS));
-  }, []);
 
   // Apply theme + accent to DOM
   useEffect(() => {
