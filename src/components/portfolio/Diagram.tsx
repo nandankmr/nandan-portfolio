@@ -28,6 +28,14 @@ export default function Diagram({ id, compact }: { id: string; compact?: boolean
   const minY = Math.min(...spec.nodes.map((n) => n.y)) - 16, maxY = Math.max(...spec.nodes.map((n) => n.y)) + H + 16;
   const lit = (e: { from: string; to: string }) => !hot || e.from === hot || e.to === hot;
 
+  // Phone layout: the same nodes as stages, left-to-right becomes top-to-bottom.
+  // Nodes within ~60 units horizontally share a stage.
+  const stages: DNode[][] = [];
+  for (const n of [...spec.nodes].sort((a, b) => a.x - b.x || a.y - b.y)) {
+    const last = stages[stages.length - 1];
+    if (last && Math.abs(last[0].x - n.x) < 60) last.push(n); else stages.push([n]);
+  }
+
   return (
     <figure className={'pf-diagram' + (compact ? ' compact' : '')}>
       <figcaption><span>{spec.title}</span><span className="pf-diagram-note">simplified · hover a part</span></figcaption>
@@ -75,6 +83,19 @@ export default function Diagram({ id, compact }: { id: string; compact?: boolean
           ))}
         </svg>
       </div>
+      <ol className="pf-steps" aria-hidden="true">
+        {stages.map((row, i) => (
+          <li key={i} style={{ '--i': i } as React.CSSProperties}>
+            {row.map((n) => (
+              <span key={n.id} className={`pf-step k-${n.kind ?? 'svc'}`}>
+                <i className="pip" />
+                <b>{n.label}</b>
+                {n.sub && <small>{n.sub}</small>}
+              </span>
+            ))}
+          </li>
+        ))}
+      </ol>
     </figure>
   );
 }
