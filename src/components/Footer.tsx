@@ -8,7 +8,7 @@ export default function Footer() {
   return (
     <footer className="pf-footer">
       <span>© {new Date().getFullYear()} Nandan Kumar</span>
-      <span>Noida · {t || '··:··'} IST · <a href={siteUrl('/uses')}>/uses</a></span>
+      <span>Noida · {t || '··:··'} IST · <a href={siteUrl('/uses')}>/uses</a> · <a href={siteUrl('/resume')}>/resume</a></span>
       <span>Built with Claude Code + Codex · reviewed by a human</span>
     </footer>
   );

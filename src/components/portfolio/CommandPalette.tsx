@@ -33,6 +33,7 @@ export default function CommandPalette({ onClose, onTheme }: { onClose: () => vo
         return 'Drafted a message for you ✍';
       } },
       { id: 'email', label: `Copy email — ${SITE.email}`, hint: 'action', keys: 'mail copy', run: () => { navigator.clipboard?.writeText(SITE.email); return 'Copied to clipboard'; } },
+      { id: 'cv', label: 'Open the live résumé (/resume)', hint: 'page', keys: 'cv resume print', run: () => { window.location.href = '/resume'; } },
       { id: 'resume', label: 'Download the résumé', hint: 'action', keys: 'cv pdf resume', run: () => { const a = document.createElement('a'); a.href = SITE.resume; a.download = ''; a.click(); } },
       { id: 'blog', label: 'Open the blog', hint: 'link', keys: 'writing posts', run: () => { window.location.href = blogUrl(); } },
       { id: 'github', label: 'Open GitHub', hint: 'link', keys: 'code repos', run: ext(`https://${SITE.github}`) },
