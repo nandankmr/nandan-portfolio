@@ -3,10 +3,27 @@ import { useState, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 
 const Turnstile = dynamic(() => import('@marsidev/react-turnstile').then((mod) => mod.Turnstile), { ssr: false });
+import type { TurnstileInstance } from '@marsidev/react-turnstile';
 import { SITE } from '@/lib/data';
 import { BLOG_LABEL, blogUrl } from '@/lib/blog/urls';
 
 type Status = 'idle' | 'sending' | 'sent' | 'error';
+
+// One click to put the address on the clipboard: recruiters paste it into ATS / email.
+function CopyEmail({ email }: { email: string }) {
+  const [done, setDone] = useState(false);
+  return (
+    <button
+      type="button"
+      className={'contact-copy' + (done ? ' done' : '')}
+      onClick={async () => {
+        try { await navigator.clipboard.writeText(email); setDone(true); setTimeout(() => setDone(false), 1800); } catch { window.location.href = `mailto:${email}`; }
+      }}
+    >
+      <span aria-live="polite">{done ? 'Copied ✓' : 'Copy email'}</span>
+    </button>
+  );
+}
 
 
 
@@ -43,7 +60,7 @@ export default function Contact() {
   }, []);
 
   const captchaToken = useRef<string>('');
-  const turnstileRef = useRef<any>(null);
+  const turnstileRef = useRef<TurnstileInstance>(undefined);
 
   const onChange = (k: keyof typeof values) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setValues((v) => ({ ...v, [k]: e.target.value }));
@@ -147,14 +164,17 @@ export default function Contact() {
                 {(status === 'idle' || status === 'error') && (<>Send message <span className="form-arrow">↗</span></>)}
               </button>
               <div className="form-msg">
-                {status === 'sent' && <span className="form-msg-ok">Thanks — I&apos;ll reply within 48 hours.</span>}
+                {status === 'sent' && <span className="form-msg-ok">Thanks. I&apos;ll reply within 48 hours.</span>}
                 {status === 'error' && <span className="form-msg-err">{errorMsg}</span>}
               </div>
             </div>
           </form>
 
           <aside className="contact-side" data-reveal style={{ '--rev-delay': '200ms' } as React.CSSProperties}>
-            <div className="contact-side-title">Direct channels</div>
+            <div className="contact-side-head">
+              <div className="contact-side-title">Direct channels</div>
+              <CopyEmail email={SITE.email} />
+            </div>
             <div className="contact-links">
               {[
                 { l: 'Email', v: SITE.email, href: `mailto:${SITE.email}` },

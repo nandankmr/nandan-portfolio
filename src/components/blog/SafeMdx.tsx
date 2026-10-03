@@ -9,19 +9,20 @@ import { mdxOptions, prepareMdxSource } from '@/lib/mdx';
  * contained to a small inline notice instead of a hard 500.
  */
 export default async function SafeMdx({ source }: { source: string }) {
+  let content: React.ReactElement | null = null;
   try {
-    const { content } = await compileMDX({
+    ({ content } = await compileMDX({
       source: prepareMdxSource(source),
       components: mdxComponents,
       options: mdxOptions,
-    });
-    return <>{content}</>;
+    }));
   } catch (error) {
     console.error('[SafeMdx] MDX compile failed:', (error as Error).message);
-    return (
-      <div className="prose-callout">
-        <p>This post couldn’t be fully rendered right now. The issue has been logged.</p>
-      </div>
-    );
   }
+  if (content) return content;
+  return (
+    <div className="prose-callout">
+      <p>This post couldn’t be fully rendered right now. The issue has been logged.</p>
+    </div>
+  );
 }
