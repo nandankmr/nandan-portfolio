@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
-import { flushSync } from 'react-dom';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { createPortal, flushSync } from 'react-dom';
 import { SITE, ACCENT_OPTIONS, type Theme, type Accent } from '@/lib/data';
 import { blogUrl } from '@/lib/blog/urls';
 
@@ -135,7 +135,24 @@ export default function Nav({ theme, onTheme, accent, onAccent, onPalette }: {
 }) {
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState('home');
+  const [menu, setMenu] = useState(false);
   const linksRef = useRef<HTMLDivElement>(null);
+  const menuBtn = useRef<HTMLButtonElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  // The sheet is portalled to <body>: the nav's backdrop-filter would otherwise
+  // trap a fixed child inside the nav's own box.
+  const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
+
+  // Phone menu: lock scroll, focus the first link, Esc closes, focus returns.
+  useEffect(() => {
+    if (!menu) return;
+    const btn = menuBtn.current;
+    document.documentElement.style.overflow = 'hidden';
+    sheetRef.current?.querySelector<HTMLElement>('a')?.focus();
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMenu(false); };
+    window.addEventListener('keydown', onKey);
+    return () => { document.documentElement.style.overflow = ''; window.removeEventListener('keydown', onKey); btn?.focus(); };
+  }, [menu]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -177,7 +194,25 @@ export default function Nav({ theme, onTheme, accent, onAccent, onPalette }: {
         <ThemeSwitcher value={theme} onChange={onTheme} />
         <AccentSwitcher value={accent} onChange={onAccent} />
         <a href={SITE.resume} download className="nav-cta">Résumé ↓</a>
+        <button ref={menuBtn} type="button" className={'nav-menu-btn' + (menu ? ' open' : '')} aria-expanded={menu} aria-controls="nav-sheet" aria-label={menu ? 'Close menu' : 'Open menu'} onClick={() => setMenu((m) => !m)}>
+          <i /><i />
+        </button>
       </div>
+      {mounted && createPortal(<div id="nav-sheet" ref={sheetRef} className={'nav-sheet' + (menu ? ' open' : '')} hidden={!menu}>
+        <ol>
+          {NAV_SECTIONS.map(([id, label, href], i) => (
+            <li key={id} style={{ '--i': i } as React.CSSProperties}>
+              <a href={href ?? `#${id}`} className={active === id ? 'active' : ''} onClick={() => setMenu(false)}>
+                <small>0{i + 1}</small>{label}
+              </a>
+            </li>
+          ))}
+        </ol>
+        <div className="nav-sheet-foot">
+          <a href={SITE.resume} download className="btn btn-primary">Résumé <span className="btn-arrow">↓</span></a>
+          <a href={`mailto:${SITE.email}`} className="btn">{SITE.email}</a>
+        </div>
+      </div>, document.body)}
     </nav>
   );
 }
