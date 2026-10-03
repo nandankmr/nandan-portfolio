@@ -2670,3 +2670,14 @@ body[data-theme="terminal"] { --accent-text: var(--accent); }
 /* Shorter status pill on phones so it stays on one line. */
 @media (max-width: 520px) { .pf-status { font-size: 11px; padding: 6px 12px 6px 10px; } }
 .nav-sheet a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+/* ── 404 ───────────────────────────────────────────────────────────── */
+.pf-404 .pf-case-title { max-width: 900px; }
+.pf-404-term { margin: 40px 0 32px; max-width: 620px; padding: 18px 20px; border-radius: 14px; background: #12130f; color: #e8e6d8; font-family: var(--font-mono); font-size: 13.5px; line-height: 1.9; white-space: pre-wrap; word-break: break-all; }
+.pf-404-term .muted { color: rgba(232, 230, 216, .55); }
+.pf-404-term .err { color: #ff7b7b; }
+.pf-404-term .accent { color: #ff8a5c; }
+.pf-404-term .l { animation: pf-enter 400ms ease both; }
+.pf-404-term .l:first-child { animation-delay: 150ms; } .pf-404-term .d1 { animation-delay: 600ms; } .pf-404-term .d2 { animation-delay: 1050ms; } .pf-404-term .d3 { animation-delay: 1500ms; } .pf-404-term .d4 { animation-delay: 1850ms; }
+.pf-404-links { display: flex; flex-wrap: wrap; gap: 10px; animation: pf-enter 500ms ease 2100ms both; }
+@media (prefers-reduced-motion: reduce) { .pf-404-term .l, .pf-404-links { animation: none; } }
